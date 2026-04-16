@@ -1,4 +1,4 @@
-const CACHE_NAME = 'minigames-v2.1';
+const CACHE_NAME = 'minigames-v3';
 
 const ASSETS_TO_CACHE = [
   '/mini-games/',
@@ -47,11 +47,8 @@ self.addEventListener('activate', function (event) {
 
 self.addEventListener('fetch', function (event) {
   event.respondWith(
-    caches.match(event.request).then(function (cached) {
-      if (cached) {
-        return cached;
-      }
-      return fetch(event.request).then(function (response) {
+    fetch(event.request)
+      .then(function (response) {
         if (!response || response.status !== 200 || response.type === 'opaque') {
           return response;
         }
@@ -60,7 +57,9 @@ self.addEventListener('fetch', function (event) {
           cache.put(event.request, responseToCache);
         });
         return response;
-      });
-    })
+      })
+      .catch(function () {
+        return caches.match(event.request);
+      })
   );
 });
