@@ -2,26 +2,30 @@
   'use strict';
 
   // --- Constantes ---
-  var CELL        = 20;       // tamanho de cada célula em px
-  var MOVE_INTERVAL = 0.13;   // segundos entre cada passo da cobra
+  var CELL          = 20;      // tamanho de cada célula em px
+  var MOVE_INTERVAL = 0.13;    // segundos entre cada passo da cobra
   var SCORE_PER_FOOD = 10;
 
-  var COLOR_BG        = '#0d0d1a';
-  var COLOR_GRID      = 'rgba(108,99,255,0.05)';
-  var COLOR_HEAD      = '#6c63ff';
-  var COLOR_BODY      = '#4d45cc';
-  var COLOR_FOOD      = '#ff6584';
-  var COLOR_FOOD_GLOW = 'rgba(255,101,132,0.35)';
+  // --- Paleta 8-bit ---
+  var COLOR_BG    = '#0a0a1a';
+  var COLOR_GRID  = 'rgba(74,58,255,0.08)';
+  var COLOR_HEAD  = '#00fff0';   // cyan
+  var COLOR_BODY  = '#4a3aff';   // accent purple
+  var COLOR_FOOD  = '#ff2d6f';   // pink
+
+  // Pulsação discreta da comida: 3 tamanhos em steps fixos
+  var FOOD_PULSE_STEPS  = [0, 1, 2, 1];   // offset em px (cresce/encolhe em degraus)
+  var FOOD_PULSE_SPEED  = 6;              // steps por segundo
 
   // --- Estado ---
-  var snake        = [];   // array de {x, y}, cabeça no índice 0
-  var dir          = { x: 1, y: 0 };
-  var nextDir      = { x: 1, y: 0 };
-  var food         = { x: 0, y: 0 };
-  var score        = 0;
-  var moveTimer    = 0;
-  var foodPulse    = 0;    // acumulador para animação da comida
-  var gameOver     = false;
+  var snake      = [];   // array de {x, y}, cabeça no índice 0
+  var dir        = { x: 1, y: 0 };
+  var nextDir    = { x: 1, y: 0 };
+  var food       = { x: 0, y: 0 };
+  var score      = 0;
+  var moveTimer  = 0;
+  var foodPulse  = 0;    // acumulador para animação discreta da comida
+  var gameOver   = false;
 
   // --- Construtor ---
   function Snake(canvas) {
@@ -65,7 +69,8 @@
   Snake.prototype.update = function (dt) {
     if (gameOver) return;
 
-    foodPulse += dt * 3.5;   // velocidade da pulsação
+    // Acumula tempo para a pulsação discreta da comida
+    foodPulse += dt * FOOD_PULSE_SPEED;
 
     moveTimer += dt;
     if (moveTimer < MOVE_INTERVAL) return;
@@ -80,7 +85,7 @@
     var cols = Math.floor(this.width  / CELL);
     var rows = Math.floor(this.height / CELL);
 
-    var head = snake[0];
+    var head    = snake[0];
     var newHead = { x: head.x + dir.x, y: head.y + dir.y };
 
     // Colisão com parede
@@ -89,7 +94,7 @@
       return;
     }
 
-    // Colisão com o corpo (ignora a calda que vai desaparecer)
+    // Colisão com o corpo (ignora a cauda que vai desaparecer)
     for (var i = 0; i < snake.length - 1; i++) {
       if (snake[i].x === newHead.x && snake[i].y === newHead.y) {
         this._triggerGameOver();
@@ -105,7 +110,7 @@
       score += SCORE_PER_FOOD;
       updateHUD();
       spawnFood(cols, rows);
-      // Não remove a calda → cobra cresce
+      // Não remove a cauda → cobra cresce
     } else {
       snake.pop();
     }
@@ -158,123 +163,116 @@
   };
 
   // ---------------------------------------------------------------
-  // Funções de desenho
+  // Funções de desenho — estilo 8-bit / pixel art
   // ---------------------------------------------------------------
+
+  // Grid de fundo: linhas de 1px a cada CELL pixels
   function drawGrid(ctx, w, h) {
     ctx.save();
     ctx.strokeStyle = COLOR_GRID;
     ctx.lineWidth   = 1;
     for (var x = 0; x <= w; x += CELL) {
+      var px = Math.floor(x);
       ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, h);
+      ctx.moveTo(px, 0);
+      ctx.lineTo(px, h);
       ctx.stroke();
     }
     for (var y = 0; y <= h; y += CELL) {
+      var py = Math.floor(y);
       ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(w, y);
+      ctx.moveTo(0, py);
+      ctx.lineTo(w, py);
       ctx.stroke();
     }
     ctx.restore();
   }
 
+  // Cobra: blocos quadrados sólidos, cabeça em cor diferente + 2 olhos de 2x2px
   function drawSnake(ctx, segments) {
-    var radius = CELL * 0.35;
+    ctx.save();
     for (var i = segments.length - 1; i >= 0; i--) {
-      var seg = segments[i];
+      var seg   = segments[i];
       var isHead = (i === 0);
-      ctx.save();
-      ctx.fillStyle = isHead ? COLOR_HEAD : COLOR_BODY;
 
-      // Borda arredondada em todos os segmentos
-      var x = seg.x * CELL + 1;
-      var y = seg.y * CELL + 1;
+      // Bloco principal — pixel-aligned, sem arredondamento
+      var bx   = Math.floor(seg.x * CELL) + 1;
+      var by   = Math.floor(seg.y * CELL) + 1;
       var size = CELL - 2;
-      roundRect(ctx, x, y, size, size, radius);
-      ctx.fill();
 
-      // Olhos na cabeça
+      ctx.fillStyle = isHead ? COLOR_HEAD : COLOR_BODY;
+      ctx.fillRect(bx, by, size, size);
+
+      // Borda interna mais escura (efeito pixel art de profundidade)
+      ctx.strokeStyle = isHead ? 'rgba(0,200,210,0.5)' : 'rgba(30,20,180,0.6)';
+      ctx.lineWidth   = 1;
+      ctx.strokeRect(bx + 1, by + 1, size - 2, size - 2);
+
+      // Olhos na cabeça: 2 pixels brancos de 2x2
       if (isHead) {
         drawEyes(ctx, seg);
       }
-      ctx.restore();
     }
-  }
-
-  function drawEyes(ctx, seg) {
-    ctx.fillStyle = '#fff';
-    var eyeR = CELL * 0.09;
-    var cx = seg.x * CELL + CELL / 2;
-    var cy = seg.y * CELL + CELL / 2;
-
-    // Posiciona os olhos de acordo com a direção atual
-    var eyeOffX = dir.y !== 0 ? CELL * 0.18 : 0;
-    var eyeOffY = dir.x !== 0 ? CELL * 0.18 : 0;
-    var fwdX    = dir.x * CELL * 0.15;
-    var fwdY    = dir.y * CELL * 0.15;
-
-    ctx.beginPath();
-    ctx.arc(cx + fwdX - eyeOffX, cy + fwdY - eyeOffY, eyeR * 1.4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(cx + fwdX + eyeOffX, cy + fwdY + eyeOffY, eyeR * 1.4, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Pupila
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(cx + fwdX - eyeOffX + dir.x * eyeR, cy + fwdY - eyeOffY + dir.y * eyeR, eyeR * 0.7, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(cx + fwdX + eyeOffX + dir.x * eyeR, cy + fwdY + eyeOffY + dir.y * eyeR, eyeR * 0.7, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawFood(ctx, f, pulse) {
-    var scale  = 1 + 0.18 * Math.sin(pulse);
-    var cx     = f.x * CELL + CELL / 2;
-    var cy     = f.y * CELL + CELL / 2;
-    var radius = (CELL / 2 - 2) * scale;
-
-    ctx.save();
-    // Brilho externo
-    var glow = ctx.createRadialGradient(cx, cy, radius * 0.2, cx, cy, radius * 1.6);
-    glow.addColorStop(0, COLOR_FOOD_GLOW);
-    glow.addColorStop(1, 'transparent');
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius * 1.6, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Círculo principal
-    ctx.fillStyle = COLOR_FOOD;
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Brilhinho interno
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
-    ctx.beginPath();
-    ctx.arc(cx - radius * 0.25, cy - radius * 0.25, radius * 0.3, 0, Math.PI * 2);
-    ctx.fill();
-
     ctx.restore();
   }
 
-  // Utilitário: rectângulo com bordas arredondadas
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
+  // Olhos: 2 quadradinhos brancos de 2x2px, posicionados de acordo com a direção
+  function drawEyes(ctx, seg) {
+    var cx = Math.floor(seg.x * CELL + CELL / 2);
+    var cy = Math.floor(seg.y * CELL + CELL / 2);
+
+    // Deslocamento lateral (perpendicular à direção)
+    var latX = dir.y !== 0 ? 3 : 0;
+    var latY = dir.x !== 0 ? 3 : 0;
+
+    // Deslocamento para frente
+    var fwdX = Math.floor(dir.x * 3);
+    var fwdY = Math.floor(dir.y * 3);
+
+    ctx.fillStyle = '#ffffff';
+
+    // Olho esquerdo
+    ctx.fillRect(
+      Math.floor(cx + fwdX - latX) - 1,
+      Math.floor(cy + fwdY - latY) - 1,
+      2, 2
+    );
+
+    // Olho direito
+    ctx.fillRect(
+      Math.floor(cx + fwdX + latX) - 1,
+      Math.floor(cy + fwdY + latY) - 1,
+      2, 2
+    );
+  }
+
+  // Comida: quadrado sólido que pulsa em 3 tamanhos discretos (sem smooth, sem glow)
+  function drawFood(ctx, f, pulse) {
+    // Índice do step discreto (0,1,2,1,0,1,2,...)
+    var stepIdx = Math.floor(pulse) % FOOD_PULSE_STEPS.length;
+    var offset  = FOOD_PULSE_STEPS[stepIdx];   // 0, 1 ou 2 px extras de cada lado
+
+    var baseSize = CELL - 4;
+    var size     = baseSize + offset * 2;
+    var fx       = Math.floor(f.x * CELL + (CELL - size) / 2);
+    var fy       = Math.floor(f.y * CELL + (CELL - size) / 2);
+
+    ctx.save();
+
+    // Quadrado principal
+    ctx.fillStyle = COLOR_FOOD;
+    ctx.fillRect(fx, fy, size, size);
+
+    // Borda sólida de 2px (cor mais escura da comida)
+    ctx.strokeStyle = '#c4004a';
+    ctx.lineWidth   = 2;
+    ctx.strokeRect(fx + 1, fy + 1, size - 2, size - 2);
+
+    // Highlight de 2x2 no canto superior esquerdo (detalhe pixel art)
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fillRect(Math.floor(fx + 2), Math.floor(fy + 2), 2, 2);
+
+    ctx.restore();
   }
 
   // ---------------------------------------------------------------
@@ -290,7 +288,7 @@
       };
       attempts++;
     } while (attempts < 500 && onSnake(pos));
-    food = pos;
+    food      = pos;
     foodPulse = 0;
   }
 

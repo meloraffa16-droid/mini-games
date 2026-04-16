@@ -34,6 +34,30 @@
       tag:   'canvas',
       url:   'src/games/game-c/index.html',
     },
+    {
+      id:    'game-d',
+      title: 'Pong',
+      desc:  'O clássico dos clássicos! Rebata a bola e vença a CPU em partidas épicas.',
+      icon:  '🏓',
+      tag:   'canvas',
+      url:   'src/games/game-d/index.html',
+    },
+    {
+      id:    'game-e',
+      title: 'Space Invaders',
+      desc:  'Defenda a Terra! Destrua as ondas de aliens antes que cheguem ao chão.',
+      icon:  '👾',
+      tag:   'canvas',
+      url:   'src/games/game-e/index.html',
+    },
+    {
+      id:    'game-f',
+      title: 'Tetris',
+      desc:  'Encaixe as peças e limpe linhas. Quanto mais rápido, maior o score!',
+      icon:  '🧩',
+      tag:   'canvas',
+      url:   'src/games/game-f/index.html',
+    },
   ];
 
   function createCard(game) {

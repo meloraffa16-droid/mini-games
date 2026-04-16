@@ -3,18 +3,30 @@
 
   var CHANGELOG = [
     {
+      version: '2.0.0',
+      date: '2026-04-16',
+      items: [
+        { emoji: '🏓', text: 'Pong — o classico dos classicos, jogador vs CPU' },
+        { emoji: '👾', text: 'Space Invaders — defenda a Terra contra ondas de aliens' },
+        { emoji: '🧩', text: 'Tetris — encaixe pecas e limpe linhas' },
+        { emoji: '🎮', text: 'Design system 8-BIT com pixel art' },
+        { emoji: '🔄', text: 'Todos os jogos convertidos para visual 8-bit' },
+      ]
+    },
+    {
       version: '1.0.0',
       date: '2026-04-15',
       items: [
-        { emoji: '🐍', text: 'Snake — cobra clássica com controles por teclado' },
+        { emoji: '🐍', text: 'Snake — cobra classica com controles por teclado' },
         { emoji: '🧱', text: 'Breakout — destrua blocos com bola e raquete' },
         { emoji: '☄️', text: 'Asteroids — pilote sua nave e destrua asteroides' },
-        { emoji: '🎨', text: 'Design system completo com tema dark' },
+        { emoji: '🎮', text: 'Design system 8-bit com pixel art' },
         { emoji: '⚙️', text: 'Motor base (GameBase) com game loop e delta time' },
       ]
     }
   ];
 
+  var FONT = "'Press Start 2P', monospace";
   var _modal = null;
 
   function buildModal() {
@@ -27,11 +39,7 @@
       'display: flex',
       'align-items: center',
       'justify-content: center',
-      'background: rgba(13, 13, 26, 0.82)',
-      'backdrop-filter: blur(6px)',
-      '-webkit-backdrop-filter: blur(6px)',
-      'opacity: 0',
-      'transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+      'background: rgba(10, 10, 26, 0.92)',
     ].join(';');
 
     overlay.addEventListener('click', function (e) {
@@ -41,57 +49,54 @@
     var panel = document.createElement('div');
     panel.style.cssText = [
       'position: relative',
-      'background: #14142b',
-      'border: 1px solid rgba(108, 99, 255, 0.18)',
-      'border-radius: 22px',
-      'box-shadow: 0 4px 32px rgba(0,0,0,0.45), 0 0 24px rgba(108,99,255,0.35)',
-      'padding: 36px 40px 32px',
-      'max-width: 480px',
-      'width: calc(100% - 48px)',
+      'background: #12122a',
+      'border: 3px solid #4a3aff',
+      'box-shadow: 6px 6px 0px #000',
+      'padding: 28px 28px 24px',
+      'max-width: 440px',
+      'width: calc(100% - 40px)',
       'max-height: 80vh',
       'overflow-y: auto',
-      'transform: translateY(16px)',
-      'transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
     ].join(';');
 
     // Close button
     var closeBtn = document.createElement('button');
-    closeBtn.textContent = '×';
+    closeBtn.textContent = 'X';
     closeBtn.setAttribute('aria-label', 'Fechar');
     closeBtn.style.cssText = [
       'position: absolute',
-      'top: 16px',
-      'right: 20px',
+      'top: 10px',
+      'right: 12px',
       'background: none',
       'border: none',
-      'color: #7a7a9d',
-      'font-size: 28px',
-      'line-height: 1',
+      'color: #6a6a9a',
+      'font-size: 12px',
+      'font-family: ' + FONT,
       'cursor: pointer',
-      'padding: 0 4px',
-      'transition: color 0.2s',
+      'padding: 4px',
     ].join(';');
     closeBtn.addEventListener('mouseenter', function () {
-      closeBtn.style.color = '#e0e0f0';
+      closeBtn.style.color = '#ff2d6f';
     });
     closeBtn.addEventListener('mouseleave', function () {
-      closeBtn.style.color = '#7a7a9d';
+      closeBtn.style.color = '#6a6a9a';
     });
     closeBtn.addEventListener('click', closeChangelog);
 
     // Header
     var header = document.createElement('div');
-    header.style.cssText = 'margin-bottom: 24px;';
+    header.style.cssText = 'margin-bottom: 20px;';
 
     var title = document.createElement('h2');
-    title.textContent = 'O que há de novo';
+    title.textContent = 'WHAT\'S NEW';
     title.style.cssText = [
       'margin: 0 0 4px',
-      'font-size: 22px',
-      'font-weight: 700',
-      'color: #e0e0f0',
-      "font-family: 'Segoe UI', system-ui, -apple-system, sans-serif",
-      'letter-spacing: -0.3px',
+      'font-size: 12px',
+      'font-weight: 400',
+      'color: #00fff0',
+      'font-family: ' + FONT,
+      'text-transform: uppercase',
+      'text-shadow: 2px 2px 0px rgba(0,0,0,0.6)',
     ].join(';');
 
     header.appendChild(title);
@@ -102,27 +107,26 @@
       versionTag.textContent = 'v' + entry.version;
       versionTag.style.cssText = [
         'display: inline-block',
-        'margin-bottom: 16px',
-        'font-size: 12px',
-        "font-family: 'Cascadia Code', 'Fira Code', monospace",
-        'color: #6c63ff',
-        'background: rgba(108, 99, 255, 0.15)',
-        'border: 1px solid rgba(108, 99, 255, 0.18)',
-        'border-radius: 999px',
-        'padding: 2px 10px',
+        'margin-bottom: 14px',
+        'font-size: 8px',
+        'font-family: ' + FONT,
+        'color: #39ff14',
+        'background: rgba(57, 255, 20, 0.1)',
+        'border: 2px solid #39ff14',
+        'padding: 3px 8px',
       ].join(';');
 
       var dateLabel = document.createElement('span');
-      dateLabel.textContent = ' · ' + entry.date;
+      dateLabel.textContent = ' ' + entry.date;
       dateLabel.style.cssText = [
-        'font-size: 12px',
-        'color: #7a7a9d',
-        "font-family: 'Cascadia Code', 'Fira Code', monospace",
-        'margin-left: 6px',
+        'font-size: 7px',
+        'color: #6a6a9a',
+        'font-family: ' + FONT,
+        'margin-left: 8px',
       ].join(';');
 
       var metaRow = document.createElement('div');
-      metaRow.style.cssText = 'display: flex; align-items: center; margin-bottom: 16px;';
+      metaRow.style.cssText = 'display: flex; align-items: center; margin-bottom: 14px;';
       metaRow.appendChild(versionTag);
       metaRow.appendChild(dateLabel);
 
@@ -133,7 +137,7 @@
         'padding: 0',
         'display: flex',
         'flex-direction: column',
-        'gap: 10px',
+        'gap: 6px',
       ].join(';');
 
       entry.items.forEach(function (item) {
@@ -142,20 +146,19 @@
           'display: flex',
           'align-items: flex-start',
           'gap: 10px',
-          'color: #e0e0f0',
-          'font-size: 14px',
-          "font-family: 'Segoe UI', system-ui, -apple-system, sans-serif",
-          'line-height: 1.5',
-          'background: rgba(108, 99, 255, 0.06)',
-          'border: 1px solid rgba(108, 99, 255, 0.10)',
-          'border-radius: 8px',
-          'padding: 10px 14px',
+          'color: #e8e8ff',
+          'font-size: 7px',
+          'font-family: ' + FONT,
+          'line-height: 1.8',
+          'background: rgba(74, 58, 255, 0.08)',
+          'border: 2px solid rgba(74, 58, 255, 0.2)',
+          'padding: 8px 12px',
         ].join(';');
 
         var emojiSpan = document.createElement('span');
         emojiSpan.textContent = item.emoji;
         emojiSpan.setAttribute('aria-hidden', 'true');
-        emojiSpan.style.cssText = 'flex-shrink: 0; font-size: 16px; line-height: 1.4;';
+        emojiSpan.style.cssText = 'flex-shrink: 0; font-size: 14px; line-height: 1.4;';
 
         var textSpan = document.createElement('span');
         textSpan.textContent = item.text;
@@ -178,7 +181,7 @@
     document.body.appendChild(overlay);
 
     // Keyboard close
-    document.addEventListener('keydown', function onKey(e) {
+    document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeChangelog();
     });
 
@@ -189,24 +192,12 @@
     if (!_modal) {
       _modal = buildModal();
     }
-
     _modal.overlay.style.display = 'flex';
-    // Trigger transition on next frame
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        _modal.overlay.style.opacity = '1';
-        _modal.panel.style.transform = 'translateY(0)';
-      });
-    });
   }
 
   function closeChangelog() {
     if (!_modal) return;
-    _modal.overlay.style.opacity = '0';
-    _modal.panel.style.transform = 'translateY(16px)';
-    setTimeout(function () {
-      if (_modal) _modal.overlay.style.display = 'none';
-    }, 200);
+    _modal.overlay.style.display = 'none';
   }
 
   global.openChangelog = openChangelog;

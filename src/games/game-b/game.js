@@ -1,21 +1,24 @@
 /**
  * game-b/game.js — Breakout (Agente 3)
  * Vanilla JS, zero dependências externas.
+ * Visual: estilo 8-BIT / PIXEL ART
  */
 (function () {
   'use strict';
 
-  // ─── Constantes visuais ────────────────────────────────────────────────────
-  var CANVAS_BG      = '#0d0d1a';
-  var COLOR_ACCENT   = '#6c63ff';
-  var COLOR_PINK     = '#ff6584';
-  var COLOR_CYAN     = '#00e5ff';
-  var COLOR_GREEN    = '#00e676';
-  var COLOR_PADDLE_A = '#6c63ff';
-  var COLOR_PADDLE_B = '#4d45cc';
+  // ─── Constantes visuais (paleta 8-bit) ────────────────────────────────────
+  var CANVAS_BG    = '#0a0a1a';
+  var COLOR_PADDLE = '#00fff0';   // cyan
+  var COLOR_BALL   = '#ffff00';   // yellow
+  var GRID_COLOR   = 'rgba(74,58,255,0.06)';
 
   // Cores por linha de blocos (4 linhas)
-  var ROW_COLORS = [COLOR_PINK, COLOR_ACCENT, COLOR_CYAN, COLOR_GREEN];
+  var ROW_COLORS = [
+    '#ff2d6f',  // L1 — pink
+    '#4a3aff',  // L2 — accent purple
+    '#00fff0',  // L3 — cyan
+    '#39ff14'   // L4 — green
+  ];
 
   // ─── Constantes de jogo ────────────────────────────────────────────────────
   var PADDLE_H        = 14;
@@ -23,7 +26,8 @@
   var PADDLE_Y_OFFSET = 32;     // distância da raquete ao fundo
   var PADDLE_SPEED    = 600;    // px/s (teclado)
 
-  var BALL_RADIUS     = 8;
+  var BALL_SIZE       = 8;      // quadrado 8×8 (pixel block)
+  var BALL_RADIUS     = BALL_SIZE / 2; // usado nas colisões AABB (half-size)
   var BALL_SPEED_BASE = 340;    // px/s
   var BALL_SPEED_MAX_MULT = 1.5;
 
@@ -32,7 +36,6 @@
   var BRICK_MARGIN_T  = 60;     // topo dos blocos
   var BRICK_GAP       = 6;
   var BRICK_H         = 22;
-  var BRICK_RADIUS    = 4;
 
   var SCORE_PER_BRICK = 10;
   var SPEED_INC       = 0.018;  // incremento fracionário por bloco destruído
@@ -81,7 +84,7 @@
     this.paddleX = (W - this.paddleW) / 2;
     this.paddleY = H - PADDLE_Y_OFFSET - PADDLE_H;
 
-    // Bola
+    // Bola (centro do quadrado)
     this.ballX  = W / 2;
     this.ballY  = this.paddleY - BALL_RADIUS - 2;
     this.ballVX = BALL_SPEED_BASE * (Math.random() < 0.5 ? 1 : -1);
@@ -109,12 +112,12 @@
         var bx = BRICK_GAP + col * (brickW + BRICK_GAP);
         var by = BRICK_MARGIN_T + row * (BRICK_H + BRICK_GAP);
         bricks.push({
-          x:       bx,
-          y:       by,
-          w:       brickW,
-          h:       BRICK_H,
-          color:   ROW_COLORS[row % ROW_COLORS.length],
-          alive:   true
+          x:     bx,
+          y:     by,
+          w:     brickW,
+          h:     BRICK_H,
+          color: ROW_COLORS[row % ROW_COLORS.length],
+          alive: true
         });
       }
     }
@@ -301,106 +304,91 @@
   // ─── Grade de fundo ────────────────────────────────────────────────────────
   Breakout.prototype._drawGrid = function (ctx, W, H) {
     ctx.save();
-    ctx.strokeStyle = 'rgba(108,99,255,0.04)';
+    ctx.strokeStyle = GRID_COLOR;
     ctx.lineWidth   = 1;
     var step = 40;
     for (var x = 0; x < W; x += step) {
       ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, H);
+      ctx.moveTo(Math.floor(x) + 0.5, 0);
+      ctx.lineTo(Math.floor(x) + 0.5, H);
       ctx.stroke();
     }
     for (var y = 0; y < H; y += step) {
       ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(W, y);
+      ctx.moveTo(0, Math.floor(y) + 0.5);
+      ctx.lineTo(W, Math.floor(y) + 0.5);
       ctx.stroke();
     }
     ctx.restore();
   };
 
-  // ─── Blocos ────────────────────────────────────────────────────────────────
+  // ─── Blocos (pixel art: fillRect sólido + borda escura interna) ────────────
   Breakout.prototype._drawBricks = function (ctx) {
     ctx.save();
+    var BORDER = 2; // espessura da borda interna
     for (var i = 0; i < this.bricks.length; i++) {
       var b = this.bricks[i];
       if (!b.alive) continue;
 
-      // Brilho sutil
-      ctx.shadowColor = b.color;
-      ctx.shadowBlur  = 6;
+      var bx = Math.floor(b.x);
+      var by = Math.floor(b.y);
+      var bw = Math.floor(b.w);
+      var bh = Math.floor(b.h);
 
-      this._roundRect(ctx, b.x, b.y, b.w, b.h, BRICK_RADIUS);
+      // Bloco principal — cor sólida
       ctx.fillStyle = b.color;
-      ctx.fill();
+      ctx.fillRect(bx, by, bw, bh);
 
-      // Borda interna mais clara
-      ctx.shadowBlur  = 0;
-      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-      ctx.lineWidth   = 1;
-      ctx.stroke();
+      // Borda interna mais escura (overlay rgba escuro)
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      // topo
+      ctx.fillRect(bx, by, bw, BORDER);
+      // esquerda
+      ctx.fillRect(bx, by, BORDER, bh);
+      // direita
+      ctx.fillRect(bx + bw - BORDER, by, BORDER, bh);
+      // base
+      ctx.fillRect(bx, by + bh - BORDER, bw, BORDER);
     }
     ctx.restore();
   };
 
-  // ─── Raquete ───────────────────────────────────────────────────────────────
+  // ─── Raquete (pixel art: fillRect sólido, cor única, cantos retos) ─────────
   Breakout.prototype._drawPaddle = function (ctx) {
     ctx.save();
-    var x  = this.paddleX;
-    var y  = this.paddleY;
-    var w  = this.paddleW;
-    var h  = PADDLE_H;
-    var r  = h / 2;
+    var x = Math.floor(this.paddleX);
+    var y = Math.floor(this.paddleY);
+    var w = Math.floor(this.paddleW);
+    var h = PADDLE_H;
 
-    var grad = ctx.createLinearGradient(x, y, x + w, y);
-    grad.addColorStop(0,   COLOR_PADDLE_A);
-    grad.addColorStop(1,   COLOR_PADDLE_B);
+    // Bloco principal
+    ctx.fillStyle = COLOR_PADDLE;
+    ctx.fillRect(x, y, w, h);
 
-    ctx.shadowColor = COLOR_PADDLE_A;
-    ctx.shadowBlur  = 12;
+    // Linha de destaque clara no topo (1px)
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fillRect(x, y, w, 1);
 
-    this._roundRect(ctx, x, y, w, h, r);
-    ctx.fillStyle = grad;
-    ctx.fill();
+    // Linha de sombra escura na base (1px)
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fillRect(x, y + h - 1, w, 1);
+
     ctx.restore();
   };
 
-  // ─── Bola ──────────────────────────────────────────────────────────────────
+  // ─── Bola (pixel art: quadrado 8×8 sólido, amarelo) ───────────────────────
   Breakout.prototype._drawBall = function (ctx) {
     ctx.save();
-    ctx.shadowColor = COLOR_CYAN;
-    ctx.shadowBlur  = 18;
+    var x = Math.floor(this.ballX - BALL_RADIUS);
+    var y = Math.floor(this.ballY - BALL_RADIUS);
 
-    ctx.beginPath();
-    ctx.arc(this.ballX, this.ballY, BALL_RADIUS, 0, Math.PI * 2);
-    ctx.fillStyle = COLOR_CYAN;
-    ctx.fill();
-
-    // Núcleo brilhante
-    ctx.shadowBlur = 0;
-    ctx.beginPath();
-    ctx.arc(this.ballX - 2, this.ballY - 2, BALL_RADIUS * 0.35, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.fill();
+    ctx.fillStyle = COLOR_BALL;
+    ctx.fillRect(x, y, BALL_SIZE, BALL_SIZE);
 
     ctx.restore();
   };
 
-  // ─── Helpers ───────────────────────────────────────────────────────────────
-  Breakout.prototype._roundRect = function (ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.arcTo(x + w, y,     x + w, y + r,     r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-    ctx.lineTo(x + r, y + h);
-    ctx.arcTo(x, y + h, x, y + h - r, r);
-    ctx.lineTo(x, y + r);
-    ctx.arcTo(x, y, x + r, y, r);
-    ctx.closePath();
-  };
-
+  // ─── HUD / Overlay ────────────────────────────────────────────────────────
   Breakout.prototype._updateHUD = function () {
     var el = document.getElementById('score');
     if (el) el.textContent = this.score;
@@ -412,12 +400,12 @@
   };
 
   Breakout.prototype._showOverlay = function (title, score) {
-    var overlay     = document.getElementById('overlay');
-    var titleEl     = document.getElementById('overlay-title');
-    var scoreEl     = document.getElementById('overlay-score');
-    if (titleEl)  titleEl.textContent  = title;
-    if (scoreEl)  scoreEl.textContent  = 'Pontuação: ' + score;
-    if (overlay)  overlay.classList.remove('overlay--hidden');
+    var overlay  = document.getElementById('overlay');
+    var titleEl  = document.getElementById('overlay-title');
+    var scoreEl  = document.getElementById('overlay-score');
+    if (titleEl) titleEl.textContent = title;
+    if (scoreEl) scoreEl.textContent = 'Pontuação: ' + score;
+    if (overlay) overlay.classList.remove('overlay--hidden');
   };
 
   // ─── Bootstrap ────────────────────────────────────────────────────────────

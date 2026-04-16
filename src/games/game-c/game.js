@@ -1,18 +1,24 @@
 /**
  * game-c/game.js — Asteroids completo.
  * Agente 4 — Implementação do jogo Asteroids usando GameBase.
+ * Visual: 8-BIT / PIXEL ART — zero shadowBlur, zero gradientes, zero arc() arredondado.
  */
 (function () {
   'use strict';
 
-  /* ─── Constantes de cores ─────────────────────────────────── */
-  var COLOR_BG        = '#0d0d1a';
-  var COLOR_SHIP      = '#00e5ff';
-  var COLOR_BULLET    = '#6c63ff';
-  var COLOR_ASTEROID  = '#e0e0f0';
-  var COLOR_STAR      = 'rgba(224,224,240,0.7)';
+  /* ─── Constantes de cores (paleta 8-bit obrigatória) ─────────── */
+  var COLOR_BG        = '#0a0a1a';
+  var COLOR_SHIP      = '#00fff0';   // cyan
+  var COLOR_THRUSTER  = '#ff2d6f';   // pink
+  var COLOR_BULLET    = '#ffff00';   // yellow
+  var COLOR_AST_FILL  = '#1a1a3a';   // escuro sólido
+  var COLOR_AST_STROKE= '#e8e8ff';   // claro
+  var COLOR_STAR      = '#e8e8ff';
+  var COLOR_PART_A    = '#ff2d6f';   // partícula rosa
+  var COLOR_PART_B    = '#ffff00';   // partícula amarela
+  var COLOR_TEXT      = '#00fff0';   // cyan para texto wave
 
-  /* ─── Constantes de jogo ──────────────────────────────────── */
+  /* ─── Constantes de jogo ──────────────────────────────────────── */
   var SHIP_ACCEL      = 220;   // px/s²
   var SHIP_FRICTION   = 0.97;  // multiplicador por frame (aplicado sobre dt)
   var SHIP_ROTATE     = 3.2;   // rad/s
@@ -30,7 +36,7 @@
   var ASTEROID_SPEEDS = { large: 55, medium: 90, small: 140 };
   var ASTEROID_VERTS  = { min: 5, max: 9 };
 
-  /* ─── Utilitários ─────────────────────────────────────────── */
+  /* ─── Utilitários ─────────────────────────────────────────────── */
   function rand(min, max) { return min + Math.random() * (max - min); }
   function randInt(min, max) { return Math.floor(rand(min, max + 1)); }
   function twoPi() { return Math.PI * 2; }
@@ -41,29 +47,33 @@
     return val;
   }
 
-  /* ─── Estrelas estáticas ──────────────────────────────────── */
+  /* helper: piso de coordenada para pixel-aligned */
+  function px(v) { return Math.floor(v); }
+
+  /* ─── Estrelas estáticas ──────────────────────────────────────── */
+  /* Cada estrela tem tamanho 1 ou 2 px; alpha fixo em 0.6 */
   function buildStars(w, h) {
     var stars = [];
     for (var i = 0; i < NUM_STARS; i++) {
       stars.push({
-        x:    rand(0, w),
-        y:    rand(0, h),
-        r:    rand(0.5, 2),
-        a:    rand(0.3, 1)
+        x: px(rand(0, w)),
+        y: px(rand(0, h)),
+        s: Math.random() < 0.35 ? 2 : 1   // tamanho: 1×1 ou 2×2
       });
     }
     return stars;
   }
 
-  /* ─── Nave ────────────────────────────────────────────────── */
+  /* ─── Nave ────────────────────────────────────────────────────── */
   function Ship(x, y) {
-    this.x       = x;
-    this.y       = y;
-    this.vx      = 0;
-    this.vy      = 0;
-    this.angle   = -Math.PI / 2; // aponta para cima
-    this.radius  = 14;
+    this.x         = x;
+    this.y         = y;
+    this.vx        = 0;
+    this.vy        = 0;
+    this.angle     = -Math.PI / 2; // aponta para cima
+    this.radius    = 14;
     this.thrusting = false;
+    this._thrusterFrame = 0; // alterna entre 2 frames fixos do thruster
   }
 
   Ship.prototype.update = function (dt, keys, w, h) {
@@ -76,6 +86,8 @@
     if (this.thrusting) {
       this.vx += Math.cos(this.angle) * SHIP_ACCEL * dt;
       this.vy += Math.sin(this.angle) * SHIP_ACCEL * dt;
+      // alterna frame do thruster a ~8fps
+      this._thrusterFrame = Math.floor(Date.now() / 120) % 2;
     }
 
     // atrito
@@ -95,17 +107,13 @@
   Ship.prototype.draw = function (ctx, blinkVisible) {
     if (!blinkVisible) return;
     ctx.save();
-    ctx.translate(this.x, this.y);
+    ctx.translate(px(this.x), px(this.y));
     ctx.rotate(this.angle);
 
-    // glow
-    ctx.shadowColor = COLOR_SHIP;
-    ctx.shadowBlur  = 14;
+    /* ── corpo triangular: stroke sólido, sem glow ── */
     ctx.strokeStyle = COLOR_SHIP;
     ctx.lineWidth   = 2;
-    ctx.lineJoin    = 'round';
-
-    // corpo triangular
+    ctx.lineJoin    = 'miter';
     ctx.beginPath();
     ctx.moveTo(18, 0);
     ctx.lineTo(-12, 11);
@@ -114,23 +122,37 @@
     ctx.closePath();
     ctx.stroke();
 
-    // chama do thruster
+    /* ── chama do thruster: 2 frames alternados, sem rand() por frame ── */
     if (this.thrusting) {
-      ctx.strokeStyle = '#ff6584';
-      ctx.shadowColor = '#ff6584';
-      ctx.shadowBlur  = 18;
-      ctx.lineWidth   = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(-7, 5);
-      ctx.lineTo(-18 - rand(0, 6), 0);
-      ctx.lineTo(-7, -5);
-      ctx.stroke();
+      ctx.strokeStyle = COLOR_THRUSTER;
+      ctx.lineWidth   = 2;
+      ctx.lineJoin    = 'miter';
+      if (this._thrusterFrame === 0) {
+        /* frame A — chama curta */
+        ctx.beginPath();
+        ctx.moveTo(-7, 5);
+        ctx.lineTo(-18, 0);
+        ctx.lineTo(-7, -5);
+        ctx.stroke();
+      } else {
+        /* frame B — chama longa */
+        ctx.beginPath();
+        ctx.moveTo(-7, 4);
+        ctx.lineTo(-24, 0);
+        ctx.lineTo(-7, -4);
+        ctx.stroke();
+        /* linha central extra para dar volume no frame longo */
+        ctx.beginPath();
+        ctx.moveTo(-7, 0);
+        ctx.lineTo(-20, 0);
+        ctx.stroke();
+      }
     }
 
     ctx.restore();
   };
 
-  /* ─── Projétil ────────────────────────────────────────────── */
+  /* ─── Projétil ────────────────────────────────────────────────── */
   function Bullet(x, y, angle) {
     this.x    = x + Math.cos(angle) * 20;
     this.y    = y + Math.sin(angle) * 20;
@@ -148,35 +170,30 @@
     this.y = wrapCoord(this.y, h);
   };
 
+  /* quadradinho 4×4 sólido — zero arc(), zero glow */
   Bullet.prototype.draw = function (ctx) {
-    ctx.save();
-    ctx.shadowColor = COLOR_BULLET;
-    ctx.shadowBlur  = 12;
-    ctx.fillStyle   = COLOR_BULLET;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, 3, 0, twoPi());
-    ctx.fill();
-    ctx.restore();
+    ctx.fillStyle = COLOR_BULLET;
+    ctx.fillRect(px(this.x) - 2, px(this.y) - 2, 4, 4);
   };
 
-  /* ─── Asteroide ───────────────────────────────────────────── */
+  /* ─── Asteroide ───────────────────────────────────────────────── */
   function Asteroid(x, y, size) {
-    this.x      = x;
-    this.y      = y;
-    this.size   = size; // 'large' | 'medium' | 'small'
-    this.radius = ASTEROID_SIZES[size];
-    var spd     = ASTEROID_SPEEDS[size];
-    var angle   = rand(0, twoPi());
-    this.vx     = Math.cos(angle) * rand(spd * 0.6, spd * 1.4);
-    this.vy     = Math.sin(angle) * rand(spd * 0.6, spd * 1.4);
+    this.x        = x;
+    this.y        = y;
+    this.size     = size; // 'large' | 'medium' | 'small'
+    this.radius   = ASTEROID_SIZES[size];
+    var spd       = ASTEROID_SPEEDS[size];
+    var angle     = rand(0, twoPi());
+    this.vx       = Math.cos(angle) * rand(spd * 0.6, spd * 1.4);
+    this.vy       = Math.sin(angle) * rand(spd * 0.6, spd * 1.4);
     this.rotSpeed = rand(-1.5, 1.5);
-    this.rot    = rand(0, twoPi());
+    this.rot      = rand(0, twoPi());
     this._buildShape();
   }
 
   Asteroid.prototype._buildShape = function () {
-    var n   = randInt(ASTEROID_VERTS.min, ASTEROID_VERTS.max);
-    var r   = this.radius;
+    var n      = randInt(ASTEROID_VERTS.min, ASTEROID_VERTS.max);
+    var r      = this.radius;
     this.verts = [];
     for (var i = 0; i < n; i++) {
       var a   = (i / n) * twoPi();
@@ -196,37 +213,43 @@
     this.y = wrapCoord(this.y, h);
   };
 
+  /* fill escuro sólido + stroke claro grosso — zero shadowBlur */
   Asteroid.prototype.draw = function (ctx) {
     ctx.save();
-    ctx.translate(this.x, this.y);
+    ctx.translate(px(this.x), px(this.y));
     ctx.rotate(this.rot);
-    ctx.shadowColor = COLOR_ASTEROID;
-    ctx.shadowBlur  = 8;
-    ctx.strokeStyle = COLOR_ASTEROID;
-    ctx.lineWidth   = 1.5;
+
     ctx.beginPath();
-    ctx.moveTo(this.verts[0].x, this.verts[0].y);
+    ctx.moveTo(px(this.verts[0].x), px(this.verts[0].y));
     for (var i = 1; i < this.verts.length; i++) {
-      ctx.lineTo(this.verts[i].x, this.verts[i].y);
+      ctx.lineTo(px(this.verts[i].x), px(this.verts[i].y));
     }
     ctx.closePath();
+
+    /* fill sólido escuro */
+    ctx.fillStyle = COLOR_AST_FILL;
+    ctx.fill();
+
+    /* stroke claro grosso */
+    ctx.strokeStyle = COLOR_AST_STROKE;
+    ctx.lineWidth   = 2;
+    ctx.lineJoin    = 'miter';
     ctx.stroke();
+
     ctx.restore();
   };
 
-  /* ─── Partícula de explosão ───────────────────────────────── */
+  /* ─── Partícula de explosão ───────────────────────────────────── */
   function Particle(x, y) {
-    var angle = rand(0, twoPi());
-    var spd   = rand(40, 160);
-    this.x    = x;
-    this.y    = y;
-    this.vx   = Math.cos(angle) * spd;
-    this.vy   = Math.sin(angle) * spd;
-    this.life = PARTICLE_LIFE;
-    this.maxLife = PARTICLE_LIFE;
-    this.len  = rand(4, 14);
-    this.angle = angle;
-    this.color = Math.random() < 0.5 ? '#ff6584' : '#00e5ff';
+    var angle      = rand(0, twoPi());
+    var spd        = rand(40, 160);
+    this.x         = x;
+    this.y         = y;
+    this.vx        = Math.cos(angle) * spd;
+    this.vy        = Math.sin(angle) * spd;
+    this.life      = PARTICLE_LIFE;
+    this.maxLife   = PARTICLE_LIFE;
+    this.color     = Math.random() < 0.5 ? COLOR_PART_A : COLOR_PART_B;
   }
 
   Particle.prototype.update = function (dt) {
@@ -237,25 +260,26 @@
     this.life -= dt;
   };
 
+  /* quadrado 2×2 com fade em steps discretos: 1.0 → 0.5 → 0 */
   Particle.prototype.draw = function (ctx) {
-    var alpha = Math.max(0, this.life / this.maxLife);
+    var ratio = Math.max(0, this.life / this.maxLife);
+    var alpha;
+    if (ratio > 0.5) {
+      alpha = 1.0;
+    } else if (ratio > 0.15) {
+      alpha = 0.5;
+    } else {
+      return; // invisível
+    }
+
     ctx.save();
     ctx.globalAlpha = alpha;
-    ctx.shadowColor = this.color;
-    ctx.shadowBlur  = 6;
-    ctx.strokeStyle = this.color;
-    ctx.lineWidth   = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y);
-    ctx.lineTo(
-      this.x + Math.cos(this.angle) * this.len,
-      this.y + Math.sin(this.angle) * this.len
-    );
-    ctx.stroke();
+    ctx.fillStyle   = this.color;
+    ctx.fillRect(px(this.x) - 1, px(this.y) - 1, 3, 3);
     ctx.restore();
   };
 
-  /* ─── Função de spawn de asteroides para uma wave ─────────── */
+  /* ─── Função de spawn de asteroides para uma wave ─────────────── */
   function spawnWave(count, w, h, ship) {
     var asteroids = [];
     for (var i = 0; i < count; i++) {
@@ -279,7 +303,7 @@
     return dist(ax, ay, bx, by) < ar + br;
   }
 
-  /* ─── Overlay helpers ─────────────────────────────────────── */
+  /* ─── Overlay helpers ─────────────────────────────────────────── */
   function showOverlay(title, score) {
     var overlay = document.getElementById('overlay');
     var titleEl = document.getElementById('overlay-title');
@@ -299,23 +323,23 @@
     if (el) el.textContent = score;
   }
 
-  /* ─── Classe principal Asteroids ──────────────────────────── */
+  /* ─── Classe principal Asteroids ──────────────────────────────── */
   function Asteroids(canvas) {
     GameBase.call(this, canvas);
-    this._keys       = {};
-    this._score      = 0;
-    this._lives      = 3;
-    this._wave       = 1;
-    this._ship       = null;
-    this._bullets    = [];
-    this._asteroids  = [];
-    this._particles  = [];
-    this._stars      = [];
-    this._shootTimer = 0;
-    this._invuln     = 0;  // tempo restante de invulnerabilidade
-    this._gameOver   = false;
+    this._keys         = {};
+    this._score        = 0;
+    this._lives        = 3;
+    this._wave         = 1;
+    this._ship         = null;
+    this._bullets      = [];
+    this._asteroids    = [];
+    this._particles    = [];
+    this._stars        = [];
+    this._shootTimer   = 0;
+    this._invuln       = 0;  // tempo restante de invulnerabilidade
+    this._gameOver     = false;
     this._waveClearing = false; // flag para aguardar nova wave
-    this._wavePause  = 0;      // contador de pausa entre waves
+    this._wavePause    = 0;     // contador de pausa entre waves
 
     var self = this;
     document.addEventListener('keydown', function (e) {
@@ -330,20 +354,20 @@
   GameBase.extend(Asteroids);
 
   Asteroids.prototype.init = function () {
-    this._score      = 0;
-    this._lives      = 3;
-    this._wave       = 1;
-    this._bullets    = [];
-    this._particles  = [];
-    this._shootTimer = 0;
-    this._invuln     = 0;
-    this._gameOver   = false;
+    this._score        = 0;
+    this._lives        = 3;
+    this._wave         = 1;
+    this._bullets      = [];
+    this._particles    = [];
+    this._shootTimer   = 0;
+    this._invuln       = 0;
+    this._gameOver     = false;
     this._waveClearing = false;
-    this._wavePause  = 0;
+    this._wavePause    = 0;
 
-    this._stars = buildStars(this.width, this.height);
-    this._ship  = new Ship(this.width / 2, this.height / 2);
-    this._asteroids = spawnWave(this._wave + 2, this.width, this.height, this._ship);
+    this._stars      = buildStars(this.width, this.height);
+    this._ship       = new Ship(this.width / 2, this.height / 2);
+    this._asteroids  = spawnWave(this._wave + 2, this.width, this.height, this._ship);
 
     updateHUD(this._score);
     hideOverlay();
@@ -497,17 +521,14 @@
     this.clear(COLOR_BG);
     var ctx = this.ctx;
 
-    /* ── Estrelas ── */
+    /* ── Estrelas: quadrados fixos, alpha fixo 0.6, zero arc() ── */
+    ctx.fillStyle   = COLOR_STAR;
+    ctx.globalAlpha = 0.6;
     for (var si = 0; si < this._stars.length; si++) {
       var s = this._stars[si];
-      ctx.save();
-      ctx.globalAlpha = s.a;
-      ctx.fillStyle   = COLOR_STAR;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, twoPi());
-      ctx.fill();
-      ctx.restore();
+      ctx.fillRect(s.x, s.y, s.s, s.s);
     }
+    ctx.globalAlpha = 1;
 
     /* ── Asteroides ── */
     for (var ai = 0; ai < this._asteroids.length; ai++) {
@@ -541,27 +562,28 @@
       ctx.save();
       ctx.textAlign    = 'center';
       ctx.textBaseline = 'middle';
-      ctx.font         = 'bold 28px "Courier New", monospace';
-      ctx.shadowColor  = '#00e5ff';
-      ctx.shadowBlur   = 20;
-      ctx.fillStyle    = '#00e5ff';
-      ctx.fillText('Wave ' + (this._wave + 1) + ' em breve...', this.width / 2, this.height / 2);
+      /* usa 'Press Start 2P' se disponível, senão monospace */
+      ctx.font         = '18px "Press Start 2P", "Courier New", monospace';
+      ctx.fillStyle    = COLOR_TEXT;
+      ctx.fillText('WAVE ' + (this._wave + 1), this.width / 2, this.height / 2 - 12);
+      ctx.font         = '12px "Press Start 2P", "Courier New", monospace';
+      ctx.fillStyle    = COLOR_AST_STROKE;
+      ctx.fillText('EM BREVE...', this.width / 2, this.height / 2 + 14);
       ctx.restore();
     }
   };
 
   Asteroids.prototype._drawCanvasHUD = function (ctx) {
-    /* Vidas como ícones triangulares no canto superior direito */
+    /* Vidas como ícones triangulares no canto superior direito — zero shadow */
     ctx.save();
     ctx.strokeStyle = COLOR_SHIP;
-    ctx.shadowColor = COLOR_SHIP;
-    ctx.shadowBlur  = 10;
-    ctx.lineWidth   = 1.5;
+    ctx.lineWidth   = 2;
+    ctx.lineJoin    = 'miter';
     for (var i = 0; i < this._lives; i++) {
       var lx = this.width - 30 - i * 28;
       var ly = 22;
       ctx.save();
-      ctx.translate(lx, ly);
+      ctx.translate(px(lx), px(ly));
       ctx.rotate(-Math.PI / 2);
       ctx.beginPath();
       ctx.moveTo(10, 0);
@@ -576,14 +598,15 @@
     /* Wave no canto inferior esquerdo */
     ctx.textAlign    = 'left';
     ctx.textBaseline = 'bottom';
-    ctx.font         = '13px "Courier New", monospace';
-    ctx.fillStyle    = 'rgba(224,224,240,0.5)';
-    ctx.shadowBlur   = 0;
+    ctx.font         = '10px "Press Start 2P", "Courier New", monospace';
+    ctx.fillStyle    = COLOR_AST_STROKE;
+    ctx.globalAlpha  = 0.6;
     ctx.fillText('WAVE ' + this._wave, 16, this.height - 12);
+    ctx.globalAlpha  = 1;
     ctx.restore();
   };
 
-  /* ─── Bootstrap ───────────────────────────────────────────── */
+  /* ─── Bootstrap ───────────────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', function () {
     var canvas = document.getElementById('game-canvas');
     var game   = new Asteroids(canvas);

@@ -3,77 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mini Games — Jogos Clássicos no Navegador</title>
-
-  <!-- SEO básico -->
-  <!-- TODO: substitua SITE_URL pelo domínio real antes de publicar -->
-  <meta name="description" content="Mini Games — uma coleção de jogos clássicos feitos com HTML5 Canvas. Jogue Snake, Breakout, Asteroids e mais, direto no navegador, sem instalação." />
-  <meta name="keywords" content="mini games, snake, breakout, asteroids, html5, canvas, jogos online, browser games, jogo no navegador" />
-  <meta name="author" content="Mini Games" />
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://SITE_URL/" />
-
-  <!-- Open Graph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://SITE_URL/" />
-  <meta property="og:title" content="Mini Games — Jogos Clássicos no Navegador" />
-  <meta property="og:description" content="Uma coleção de jogos clássicos feitos com HTML5 Canvas. Snake, Breakout, Asteroids e mais — jogue agora, sem instalação." />
-  <meta property="og:image" content="https://SITE_URL/og-image.png" />
-  <meta property="og:locale" content="pt_BR" />
-  <meta property="og:site_name" content="Mini Games" />
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Mini Games — Jogos Clássicos no Navegador" />
-  <meta name="twitter:description" content="Uma coleção de jogos clássicos feitos com HTML5 Canvas. Snake, Breakout, Asteroids e mais — jogue agora, sem instalação." />
-  <meta name="twitter:image" content="https://SITE_URL/og-image.png" />
-
-  <!-- JSON-LD: WebSite -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Mini Games",
-    "url": "https://SITE_URL/",
-    "description": "Uma coleção de jogos clássicos feitos com HTML5 Canvas. Snake, Breakout, Asteroids e mais, direto no navegador.",
-    "inLanguage": "pt-BR"
-  }
-  </script>
-
-  <!-- JSON-LD: ItemList de jogos -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "Lista de Mini Games",
-    "url": "https://SITE_URL/",
-    "numberOfItems": 3,
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Snake",
-        "url": "https://SITE_URL/src/games/game-a/index.html",
-        "description": "Guie a cobra para comer a comida sem bater nas paredes. Quanto mais come, maior fica!"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Breakout",
-        "url": "https://SITE_URL/src/games/game-b/index.html",
-        "description": "Destrua todos os blocos com a bola e a raquete. Não deixe a bola cair!"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": "Asteroids",
-        "url": "https://SITE_URL/src/games/game-c/index.html",
-        "description": "Pilote sua nave e destrua asteroides antes que te alcancem. Sobreviva o máximo possível!"
-      }
-    ]
-  }
-  </script>
-
+  <title>Mini Games</title>
   <link rel="stylesheet" href="styles/main.css" />
 </head>
 <body>
@@ -84,14 +14,14 @@
       <span class="header__logo-icon">&#9632;</span>
       <span class="header__logo-text">Mini Games</span>
     </div>
-    <span class="header__version" id="version-badge">v1.0.0</span>
+    <span class="header__version" id="version-badge">v2.0.0</span>
     <button
       onclick="openChangelog()"
-      style="cursor:pointer;font-size:12px;font-family:'Cascadia Code','Fira Code',monospace;color:#00e5ff;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);border-radius:999px;padding:3px 10px;transition:background 0.2s,border-color 0.2s;outline:none;"
-      onmouseenter="this.style.background='rgba(0,229,255,0.16)';this.style.borderColor='rgba(0,229,255,0.4)';"
-      onmouseleave="this.style.background='rgba(0,229,255,0.08)';this.style.borderColor='rgba(0,229,255,0.2)';"
+      style="cursor:pointer;font-size:7px;font-family:'Press Start 2P',monospace;color:#00fff0;background:transparent;border:2px solid #00fff0;padding:5px 10px;text-transform:uppercase;outline:none;"
+      onmouseenter="this.style.background='rgba(0,255,240,0.12)';this.style.color='#fff';"
+      onmouseleave="this.style.background='transparent';this.style.color='#00fff0';"
       aria-label="O que há de novo"
-    >O que há de novo</button>
+    >NEW!</button>
   </header>
 
   <main class="main">

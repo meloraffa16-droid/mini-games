@@ -29,6 +29,7 @@
   GameBase.prototype.start = function () {
     this.running = true;
     this.paused  = false;
+    this._resize();
     this.init();
     this._lastTime  = performance.now();
     var self = this;
