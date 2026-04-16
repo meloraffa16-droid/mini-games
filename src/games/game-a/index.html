@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snake — Mini Games</title>
+
+  <!-- SEO básico -->
+  <meta name="description" content="Jogue Snake no navegador! Guie a cobra para comer a comida sem bater nas paredes. Quanto mais come, maior e mais difícil fica." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://SITE_URL/src/games/game-a/index.html" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://SITE_URL/src/games/game-a/index.html" />
+  <meta property="og:title" content="Snake — Mini Games" />
+  <meta property="og:description" content="Guie a cobra para comer a comida sem bater nas paredes. Quanto mais come, maior fica! Jogue agora no navegador." />
+  <meta property="og:image" content="https://SITE_URL/og-image.png" />
+  <meta property="og:site_name" content="Mini Games" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Snake — Mini Games" />
+  <meta name="twitter:description" content="Guie a cobra para comer a comida sem bater nas paredes. Jogue agora no navegador." />
+  <meta name="twitter:image" content="https://SITE_URL/og-image.png" />
+
+  <!-- JSON-LD: VideoGame -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "Snake",
+    "url": "https://SITE_URL/src/games/game-a/index.html",
+    "description": "Guie a cobra para comer a comida sem bater nas paredes. Quanto mais come, maior e mais difícil fica.",
+    "genre": "Arcade",
+    "playMode": "SinglePlayer",
+    "applicationCategory": "Game",
+    "operatingSystem": "Web Browser",
+    "inLanguage": "pt-BR",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Mini Games",
+      "url": "https://SITE_URL/"
+    }
+  }
+  </script>
+
+  <link rel="stylesheet" href="../../styles/main.css" />
+  <style>
+    .canvas-wrapper { width: 800px; height: 500px; }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <div class="game-page">
+    <div class="game-page__header">
+      <a class="btn-back" href="../../index.html">&#8592; Menu</a>
+      <h1 class="game-page__title">🐍 Snake</h1>
+    </div>
+
+    <div class="hud">
+      <div>
+        <div class="hud__label">Pontuação</div>
+        <div class="hud__score" id="score">0</div>
+      </div>
+    </div>
+
+    <div class="canvas-wrapper" id="canvas-wrapper">
+      <canvas id="game-canvas"></canvas>
+
+      <div class="overlay overlay--hidden" id="overlay">
+        <div class="overlay__title" id="overlay-title">Game Over</div>
+        <div class="overlay__score" id="overlay-score"></div>
+        <button class="btn btn--primary" id="btn-restart">Jogar Novamente</button>
+        <a class="btn btn--ghost" href="../../index.html">Voltar ao Menu</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../src/engine/GameBase.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
