@@ -1,4 +1,4 @@
-const CACHE_NAME = 'minigames-v2';
+const CACHE_NAME = 'minigames-v2.1';
 
 const ASSETS_TO_CACHE = [
   '/mini-games/',
@@ -18,7 +18,9 @@ const ASSETS_TO_CACHE = [
   '/mini-games/src/games/game-e/game.js',
   '/mini-games/src/games/game-e/index.html',
   '/mini-games/src/games/game-f/game.js',
-  '/mini-games/src/games/game-f/index.html'
+  '/mini-games/src/games/game-f/index.html',
+  '/mini-games/icons/icon.svg',
+  '/mini-games/manifest.json'
 ];
 
 self.addEventListener('install', function (event) {
