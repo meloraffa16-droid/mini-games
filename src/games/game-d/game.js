@@ -155,10 +155,12 @@
     if (this.ballY <= 0) {
       this.ballY  = 0;
       this.ballVY = Math.abs(this.ballVY);
+      SoundFX.wall();
     }
     if (this.ballY + BALL_SIZE >= this.height) {
       this.ballY  = this.height - BALL_SIZE;
       this.ballVY = -Math.abs(this.ballVY);
+      SoundFX.wall();
     }
 
     // Colisao com paddle do jogador (esquerda)
@@ -199,6 +201,7 @@
   };
 
   Pong.prototype._bounceOffPaddle = function (newBallX, paddleY, dirX) {
+    SoundFX.paddle();
     // Reposiciona a bola fora do paddle
     this.ballX = newBallX;
 
@@ -225,7 +228,13 @@
       this.winner   = title;
       var finalScore = (title === 'YOU WIN') ? this.scorePlayer : this.scoreCpu;
       showOverlay(title, finalScore);
+      if (title === 'YOU WIN') {
+        SoundFX.win();
+      } else {
+        SoundFX.gameOver();
+      }
     } else {
+      SoundFX.score();
       // Proximo round: bola vai na direcao de quem perdeu o ponto
       var nextDir = (title === 'YOU WIN') ? -1 : 1;
       this._resetRound(nextDir);

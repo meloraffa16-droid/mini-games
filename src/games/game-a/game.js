@@ -107,6 +107,7 @@
 
     // Comeu a comida?
     if (newHead.x === food.x && newHead.y === food.y) {
+      SoundFX.eat();
       score += SCORE_PER_FOOD;
       updateHUD();
       spawnFood(cols, rows);
@@ -133,6 +134,7 @@
   // ---------------------------------------------------------------
   Snake.prototype._triggerGameOver = function () {
     gameOver = true;
+    SoundFX.gameOver();
     this.stop();
     showOverlay('Game Over', score);
   };

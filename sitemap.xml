@@ -1,31 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- TODO: substitua SITE_URL pelo domínio real antes de publicar -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://SITE_URL/</loc>
-    <lastmod>2026-04-15</lastmod>
+    <loc>https://meloraffa16-droid.github.io/mini-games/</loc>
+    <lastmod>2026-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://SITE_URL/src/games/game-a/index.html</loc>
-    <lastmod>2026-04-15</lastmod>
+    <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-a/index.html</loc>
+    <lastmod>2026-04-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://SITE_URL/src/games/game-b/index.html</loc>
-    <lastmod>2026-04-15</lastmod>
+    <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-b/index.html</loc>
+    <lastmod>2026-04-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://SITE_URL/src/games/game-c/index.html</loc>
-    <lastmod>2026-04-15</lastmod>
+    <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-c/index.html</loc>
+    <lastmod>2026-04-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-d/index.html</loc>
+    <lastmod>2026-04-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-e/index.html</loc>
+    <lastmod>2026-04-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-f/index.html</loc>
+    <lastmod>2026-04-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

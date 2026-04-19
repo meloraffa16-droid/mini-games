@@ -284,6 +284,7 @@
     // Fire
     if ((this._keys['Space'] || this._keys['ArrowUp'] || this._keys['KeyW']) && !this._pb) {
       this._pb = { x: this._px, y: this._py - PLAYER_H };
+      SoundFX.shoot();
     }
   };
 
@@ -407,6 +408,7 @@
             by >= a.y && by <= a.y + ALIEN_H) {
           a.alive = false;
           this._pb = null;
+          SoundFX.alienDie();
           // Score by row: row 0 = 40, 1 = 30, 2 = 20, 3 = 10
           var pts = [40, 30, 20, 10][a.row] || 10;
           this._score += pts;
@@ -430,8 +432,10 @@
           b.y >= py - PLAYER_H && b.y <= py) {
         this._abs.splice(i, 1);
         this._lives--;
+        SoundFX.loseLife();
         if (this._lives <= 0) {
           this._gameOver = true;
+          SoundFX.gameOver();
         } else {
           // Brief invincibility reset (simple: just continue)
           this._px = Math.floor(this.width / 2);
@@ -453,6 +457,7 @@
       if (!a.alive) continue;
       if (a.y + ALIEN_H >= playerLine) {
         this._gameOver = true;
+        SoundFX.gameOver();
         break;
       }
     }
@@ -510,6 +515,7 @@
     }
     var alive = this._aliveAliens();
     if (alive.length === 0) {
+      SoundFX.newWave();
       this._wave++;
       this._initWave();
       // Show brief wave message drawn on canvas (handled in render)

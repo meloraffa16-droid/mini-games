@@ -393,6 +393,7 @@
     var canShoot = this._keys['Space'] && this._shootTimer === 0 && this._bullets.length < MAX_BULLETS;
     if (canShoot) {
       this._bullets.push(new Bullet(this._ship.x, this._ship.y, this._ship.angle));
+      SoundFX.shoot();
       this._shootTimer = SHOOT_COOLDOWN;
     }
 
@@ -453,6 +454,7 @@
     /* ── Verificar wave vazia ── */
     if (this._asteroids.length === 0 && !this._waveClearing) {
       this._waveClearing = true;
+      SoundFX.newWave();
       this._wavePause    = 2.0;
     }
   };
@@ -468,6 +470,7 @@
 
   Asteroids.prototype._destroyAsteroid = function (idx) {
     var ast = this._asteroids[idx];
+    SoundFX.explosion();
 
     // score
     this._score += ASTEROID_SCORES[ast.size];
@@ -492,6 +495,7 @@
   };
 
   Asteroids.prototype._loseLife = function () {
+    SoundFX.loseLife();
     this._lives--;
     // partículas de explosão da nave
     for (var p = 0; p < 20; p++) {
@@ -500,6 +504,7 @@
 
     if (this._lives <= 0) {
       this._gameOver = true;
+      SoundFX.gameOver();
       var self = this;
       // pequeno delay para ver a explosão
       setTimeout(function () {

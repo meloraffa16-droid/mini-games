@@ -161,16 +161,19 @@
     if (this.ballX - BALL_RADIUS < 0) {
       this.ballX  = BALL_RADIUS;
       this.ballVX = Math.abs(this.ballVX);
+      SoundFX.wall();
     }
     if (this.ballX + BALL_RADIUS > W) {
       this.ballX  = W - BALL_RADIUS;
       this.ballVX = -Math.abs(this.ballVX);
+      SoundFX.wall();
     }
 
     // Parede superior
     if (this.ballY - BALL_RADIUS < 0) {
       this.ballY  = BALL_RADIUS;
       this.ballVY = Math.abs(this.ballVY);
+      SoundFX.wall();
     }
 
     // Colisão com raquete
@@ -181,6 +184,7 @@
 
     // Bola saiu pela base → Game Over
     if (this.ballY - BALL_RADIUS > H) {
+      SoundFX.gameOver();
       this._showOverlay('Game Over', this.score);
       this.stop();
       return;
@@ -192,6 +196,7 @@
       if (this.bricks[i].alive) { alive++; break; }
     }
     if (alive === 0) {
+      SoundFX.win();
       this._showOverlay('Você Venceu!', this.score);
       this.stop();
     }
@@ -224,6 +229,7 @@
 
       // Empurrar a bola para fora da raquete
       this.ballY = py - r - 1;
+      SoundFX.paddle();
     }
   };
 
@@ -242,6 +248,7 @@
       if (by + r < brick.y || by - r > brick.y + brick.h) continue;
 
       brick.alive = false;
+      SoundFX.brick();
 
       // Determinar qual lado foi atingido calculando a sobreposição em cada eixo
       var overlapLeft   = (bx + r) - brick.x;

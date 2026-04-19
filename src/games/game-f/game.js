@@ -142,12 +142,12 @@
     if (this._gameOver) return;
 
     switch (e.code) {
-      case 'ArrowLeft':  case 'KeyA': this._tryMove(0, -1); break;
-      case 'ArrowRight': case 'KeyD': this._tryMove(0,  1); break;
-      case 'ArrowUp':    case 'KeyW': this._tryRotate(); break;
+      case 'ArrowLeft':  case 'KeyA': if (this._tryMove(0, -1)) SoundFX.move(); break;
+      case 'ArrowRight': case 'KeyD': if (this._tryMove(0,  1)) SoundFX.move(); break;
+      case 'ArrowUp':    case 'KeyW': this._tryRotate(); SoundFX.rotate(); break;
       case 'ArrowDown':  case 'KeyS':
         // soft drop: move down immediately
-        if (this._tryMove(1, 0)) { this._score += 1; updateHUD(this._score); }
+        if (this._tryMove(1, 0)) { this._score += 1; updateHUD(this._score); SoundFX.move(); }
         this._gravTimer = 0; // reset gravity timer so we don't double-drop
         break;
       case 'Space':
@@ -306,6 +306,7 @@
     var p = this._current;
     var dropDist = this._ghost - p.row;
     p.row = this._ghost;
+    SoundFX.drop();
     this._score += dropDist * 2;
     updateHUD(this._score);
     this._lockPiece();
@@ -342,11 +343,13 @@
     }
 
     if (full.length > 0) {
+      SoundFX.lineClear();
       this._flashLines = full;
       this._clearing   = true;
       this._flashTimer = 0;
       // Defer board clearing + next piece spawn until flash finishes
     } else {
+      SoundFX.hit();
       this._spawnNext();
     }
   };
@@ -398,6 +401,7 @@
 
   Tetris.prototype._triggerGameOver = function () {
     this._gameOver = true;
+    SoundFX.gameOver();
     showOverlay('GAME OVER', this._score);
   };
 
