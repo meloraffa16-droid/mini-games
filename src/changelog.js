@@ -3,6 +3,19 @@
 
   var CHANGELOG = [
     {
+      version: '3.0.0',
+      date: '2026-04-18',
+      items: [
+        { emoji: '🐦', text: 'Flappy Bird — voe entre canos num desafio viciante' },
+        { emoji: '🐸', text: 'Frogger — atravesse estradas e rios sem ser atropelado' },
+        { emoji: '👻', text: 'Pac-Man — coma dots e fuja dos fantasmas no labirinto' },
+        { emoji: '💣', text: 'Minesweeper — o campo minado classico do Windows' },
+        { emoji: '🏍️', text: 'Tron — pilote motos de luz e force a CPU a bater' },
+        { emoji: '🦘', text: 'Doodle Jump — pule em plataformas ate o infinito' },
+        { emoji: '🔊', text: 'Efeitos sonoros 8-bit em todos os 12 jogos' },
+      ]
+    },
+    {
       version: '2.0.0',
       date: '2026-04-16',
       items: [

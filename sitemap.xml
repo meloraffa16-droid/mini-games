@@ -3,7 +3,7 @@
 
   <url>
     <loc>https://meloraffa16-droid.github.io/mini-games/</loc>
-    <lastmod>2026-04-16</lastmod>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -46,6 +46,48 @@
   <url>
     <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-f/index.html</loc>
     <lastmod>2026-04-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-g/index.html</loc>
+    <lastmod>2026-04-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-h/index.html</loc>
+    <lastmod>2026-04-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-i/index.html</loc>
+    <lastmod>2026-04-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-j/index.html</loc>
+    <lastmod>2026-04-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-k/index.html</loc>
+    <lastmod>2026-04-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://meloraffa16-droid.github.io/mini-games/src/games/game-l/index.html</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

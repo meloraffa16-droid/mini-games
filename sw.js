@@ -1,4 +1,4 @@
-const CACHE_NAME = 'minigames-v3';
+const CACHE_NAME = 'minigames-v4';
 
 const ASSETS_TO_CACHE = [
   '/mini-games/',
@@ -7,6 +7,7 @@ const ASSETS_TO_CACHE = [
   '/mini-games/src/main.js',
   '/mini-games/src/changelog.js',
   '/mini-games/src/engine/GameBase.js',
+  '/mini-games/src/engine/SoundFX.js',
   '/mini-games/src/games/game-a/game.js',
   '/mini-games/src/games/game-a/index.html',
   '/mini-games/src/games/game-b/game.js',
@@ -19,6 +20,18 @@ const ASSETS_TO_CACHE = [
   '/mini-games/src/games/game-e/index.html',
   '/mini-games/src/games/game-f/game.js',
   '/mini-games/src/games/game-f/index.html',
+  '/mini-games/src/games/game-g/game.js',
+  '/mini-games/src/games/game-g/index.html',
+  '/mini-games/src/games/game-h/game.js',
+  '/mini-games/src/games/game-h/index.html',
+  '/mini-games/src/games/game-i/game.js',
+  '/mini-games/src/games/game-i/index.html',
+  '/mini-games/src/games/game-j/game.js',
+  '/mini-games/src/games/game-j/index.html',
+  '/mini-games/src/games/game-k/game.js',
+  '/mini-games/src/games/game-k/index.html',
+  '/mini-games/src/games/game-l/game.js',
+  '/mini-games/src/games/game-l/index.html',
   '/mini-games/icons/icon.svg',
   '/mini-games/manifest.json'
 ];

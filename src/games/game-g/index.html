@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flappy Bird — Mini Games</title>
+  <meta name="description" content="Jogue Flappy Bird 8-bit! Toque ou pressione espaco para voar entre os canos. Quanto mais longe, maior o score!" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://meloraffa16-droid.github.io/mini-games/src/games/game-g/index.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://meloraffa16-droid.github.io/mini-games/src/games/game-g/index.html" />
+  <meta property="og:title" content="Flappy Bird — Mini Games 8-bit" />
+  <meta property="og:description" content="Jogue Flappy Bird 8-bit! Voe entre os canos e bata seu recorde!" />
+  <meta property="og:site_name" content="Mini Games" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Flappy Bird — Mini Games 8-bit" />
+  <meta name="twitter:description" content="Jogue Flappy Bird 8-bit! Voe entre os canos e bata seu recorde!" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "Flappy Bird",
+    "url": "https://meloraffa16-droid.github.io/mini-games/src/games/game-g/index.html",
+    "description": "Jogue Flappy Bird 8-bit! Toque para voar entre os canos.",
+    "genre": "Arcade",
+    "playMode": "SinglePlayer",
+    "applicationCategory": "Game",
+    "operatingSystem": "Web Browser",
+    "inLanguage": "pt-BR"
+  }
+  </script>
+  <link rel="stylesheet" href="../../../styles/main.css" />
+  <style>
+    .canvas-wrapper { width: 800px; height: 500px; }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="game-page">
+    <div class="game-page__header">
+      <a class="btn-back" href="../../../index.html">&#8592; MENU</a>
+      <h1 class="game-page__title">FLAPPY BIRD</h1>
+    </div>
+    <div class="hud">
+      <div>
+        <div class="hud__label">SCORE</div>
+        <div class="hud__score" id="score">0</div>
+      </div>
+    </div>
+    <div class="canvas-wrapper" id="canvas-wrapper">
+      <canvas id="game-canvas"></canvas>
+      <div class="overlay overlay--hidden" id="overlay">
+        <div class="overlay__title" id="overlay-title">GAME OVER</div>
+        <div class="overlay__score" id="overlay-score"></div>
+        <button class="btn btn--primary" id="btn-restart">PLAY AGAIN</button>
+        <a class="btn btn--ghost" href="../../../index.html">BACK TO MENU</a>
+      </div>
+    </div>
+  </div>
+  <script src="../../../src/engine/GameBase.js"></script>
+  <script src="../../../src/engine/SoundFX.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
